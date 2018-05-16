@@ -18,6 +18,7 @@ public class SlowServiceController {
     @RequestMapping(method = RequestMethod.POST, path = "/call")
     public ResponseEntity<Output> call(@RequestBody final Input input) {
         try {
+            LOGGER.debug("Put thread to sleep for 5 seconds");
             Thread.sleep(5000);
         } catch (InterruptedException ie) {
             LOGGER.debug("Sleeping thread was interrupted");
