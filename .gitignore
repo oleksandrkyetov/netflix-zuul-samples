@@ -1,0 +1,7 @@
+# Build output directies
+**/target
+**/build
+
+# IntelliJ specific files/directories
+**/.idea
+**/*.iml
