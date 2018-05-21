@@ -37,18 +37,20 @@ public class ZuulHystrixSlowServiceCommand extends HystrixObservableCommand<Http
                     final CloseableHttpClient closeableHttpClient = HttpClients.createDefault();
                     final HttpPost httpPost = new HttpPost("http://localhost:8080/slow/service/call");
 
-                    final Input input = new Input("Zuul 2 + Hystrix Test");
+                    final Input input = new Input("Zuul + Hystrix");
                     final StringEntity stringEntity = new StringEntity(GSON.toJson(input));
                     stringEntity.setContentType("application/json");
 
                     httpPost.setEntity(stringEntity);
 
                     final HttpResponse httpResponse = closeableHttpClient.execute(httpPost);
-                    final Output output = GSON.fromJson(new InputStreamReader(httpResponse.getEntity().getContent()), Output.class);
 
-                    final HttpResponseMessage httpResponseMessage = new HttpResponseMessageImpl(httpRequestMessage.getContext(),
-                        httpRequestMessage, 200);
-                    httpResponseMessage.setBodyAsText(output.getString());
+                    final HttpResponseMessage httpResponseMessage = new HttpResponseMessageImpl(
+                        httpRequestMessage.getContext(), httpRequestMessage, httpResponse.getStatusLine().getStatusCode());
+                    if (httpResponse.getStatusLine().getStatusCode() == 200) {
+                        httpResponseMessage.setBodyAsText(GSON.fromJson(
+                            new InputStreamReader(httpResponse.getEntity().getContent()), Output.class).getString());
+                    }
 
                     observer.onNext(httpResponseMessage);
                     observer.onCompleted();
