@@ -5,7 +5,9 @@ import com.netflix.config.ConfigurationManager;
 import com.netflix.governator.InjectorBuilder;
 import com.netflix.zuul.netty.server.BaseServerStartup;
 import com.netflix.zuul.netty.server.Server;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 public class ZuulHystrixBootstrap {
 
     public static void main(final String[] args) {
@@ -13,31 +15,26 @@ public class ZuulHystrixBootstrap {
     }
 
     private void start() {
-        System.out.println("Zuul Sample: starting up.");
-        long startTime = System.currentTimeMillis();
+        LOGGER.debug("Zuul + Hystrix is starting ...");
+
         int exitCode = 0;
 
         Server server = null;
-
         try {
             ConfigurationManager.loadCascadedPropertiesFromResources("application");
-            Injector injector = InjectorBuilder.fromModule(new ZuulHystrixModule()).createInjector();
-            BaseServerStartup serverStartup = injector.getInstance(BaseServerStartup.class);
-            server = serverStartup.server();
 
-            long startupDuration = System.currentTimeMillis() - startTime;
-            System.out.println("Zuul Sample: finished startup. Duration = " + startupDuration + " ms");
+            final Injector injector = InjectorBuilder.fromModule(new ZuulHystrixModule()).createInjector();
+            server = injector.getInstance(BaseServerStartup.class).server();
 
+            LOGGER.debug("Zuul + Hystrix successfully started");
             server.start(true);
-        } catch (Throwable t) {
-            t.printStackTrace();
-            System.err.println("###############");
-            System.err.println("Zuul Sample: initialization failed. Forcing shutdown now.");
-            System.err.println("###############");
+        } catch (final Throwable t) {
+            LOGGER.error("Zuul + Hystrix failed to start");
             exitCode = 1;
         } finally {
-            // server shutdown
-            if (server != null) server.stop();
+            if (server != null) {
+                server.stop();
+            }
 
             System.exit(exitCode);
         }

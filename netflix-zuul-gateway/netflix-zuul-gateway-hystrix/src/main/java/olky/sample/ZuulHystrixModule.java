@@ -40,27 +40,22 @@ public class ZuulHystrixModule extends AbstractModule {
 
     @Override
     protected void configure() {
-        // sample specific bindings
         bind(BaseServerStartup.class).to(ZuulHystrixServerStartup.class);
 
-        // use provided basic netty origin manager
         bind(OriginManager.class).to(BasicNettyOriginManager.class);
 
-        // zuul filter loading
         install(new ZuulFiltersModule());
         bind(FilterFileManager.class).asEagerSingleton();
 
-        // general server bindings
-        bind(ServerStatusManager.class); // health/discovery status
-        bind(SessionContextDecorator.class).to(ZuulSessionContextDecorator.class); // decorate new sessions when requests come in
-        bind(Registry.class).to(DefaultRegistry.class); // atlas metrics registry
-        bind(RequestCompleteHandler.class).to(BasicRequestCompleteHandler.class); // metrics post-request completion
-        bind(AbstractDiscoveryClientOptionalArgs.class).to(DiscoveryClient.DiscoveryClientOptionalArgs.class); // discovery client
-        bind(RequestMetricsPublisher.class).to(BasicRequestMetricsPublisher.class); // timings publisher
+        bind(ServerStatusManager.class);
+        bind(SessionContextDecorator.class).to(ZuulSessionContextDecorator.class);
+        bind(Registry.class).to(DefaultRegistry.class);
+        bind(RequestCompleteHandler.class).to(BasicRequestCompleteHandler.class);
+        bind(AbstractDiscoveryClientOptionalArgs.class).to(DiscoveryClient.DiscoveryClientOptionalArgs.class);
+        bind(RequestMetricsPublisher.class).to(BasicRequestMetricsPublisher.class);
 
-        // access logger, including request ID generator
         bind(AccessLogPublisher.class).toInstance(new AccessLogPublisher("ACCESS",
-                (channel, httpRequest) -> ClientRequestReceiver.getRequestFromChannel(channel).getContext().getUUID()));
+            (channel, httpRequest) -> ClientRequestReceiver.getRequestFromChannel(channel).getContext().getUUID()));
     }
 
 }

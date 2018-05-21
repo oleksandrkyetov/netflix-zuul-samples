@@ -23,6 +23,7 @@
     <modules>
         <module>netflix-zuul-service</module>
         <module>netflix-zuul-gateway</module>
+        <module>netflix-zuul-service-shared</module>
     </modules>
 
     <dependencyManagement>
